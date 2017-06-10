@@ -27,6 +27,7 @@ var onload = function () {
     canvas = document.getElementById("renderCanvas");
 	  engine = new BABYLON.Engine(canvas, true);
 
+
     // Scene creation
 	initScene();
 
@@ -35,41 +36,83 @@ var onload = function () {
         if (!ship.killed) {
             ship.move();
             camera.position.z += ship.speed;
-            ship.position.z += ship.speed;
-            ground.position.z += ship.speed;
-        }
+            ship.position.z+= ship.speed;
+
+          }
+
         scene.render();
 	});
 };
-
-
 var initScene = function() {
-    console.log("launching scene");
+
     scene = new BABYLON.Scene(engine);
 
+    //loading the physics engine.
+    scene = new BABYLON.Scene(engine);
+    scene.enablePhysics(new BABYLON.Vector3(0,0,0), new BABYLON.OimoJSPlugin());
+
     // Camera attached to the canvas
-    camera = new BABYLON.FreeCamera("Camera", new BABYLON.Vector3(0, 5, -30), scene);
+    camera = new BABYLON.FreeCamera("Camera", new BABYLON.Vector3(0, 0, -40), scene);
     camera.setTarget(new BABYLON.Vector3(0,0,20));
+    scene.activeCamera = camera;
+
     camera.maxZ = 1000;
-    camera.speed = 4;
+    camera.speed = 0;
+
+    //creating the sky of outer space
+    /*var skybox = BABYLON.MeshBuilder.CreateBox("skyBox",{size:1000.0},scene);
+    var skyboxMaterial = new BABYLON.StandardMaterial("skyBox",scene);
+    skyboxMaterial.backFaceCulling = false;
+    skyboxMaterial.disableLighting = false;
+    skybox.material = skyboxMaterial;
+    skybox.infiniteDistance = true;
+    skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("assets/sky/sky",scene);
+    skyboxMaterial.diffuseColor = new BABYLON.Color3(0,0,0);
+    skyboxMaterial.specularColor = new BABYLON.Color3(0,0,0);
+    skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE; */
 
     // Hemispheric light to light the scene
-    var h = new BABYLON.HemisphericLight("hemi", new BABYLON.Vector3(0, 0.5, 0), scene);
-    h.intensity = 0.6;
+    /*var h = new BABYLON.HemisphericLight("hemi", new BABYLON.Vector3(0, 0.5, 0), scene);
+    h.intensity = 0.3;
 
     var d = new BABYLON.DirectionalLight("dir", new BABYLON.Vector3(0,-0.5,0.5), scene);
     d.position = new BABYLON.Vector3(0.1,100,-100);
     d.intensity = 0.4;
-    d.diffuse = BABYLON.Color3.FromInts(204,196,255);
+    d.diffuse = BABYLON.Color3.FromInts(204,196,255); */
+
+    var light = new BABYLON.PointLight("light", new BABYLON.Vector3(0,-5,-5), scene);
+
+
+    var skybox = BABYLON.MeshBuilder.CreateBox("skyBox", {size:2000.0}, scene);
+    var skyboxMaterial = new BABYLON.StandardMaterial("skyBox", scene);
+    skyboxMaterial.backFaceCulling = false;
+    skyboxMaterial.infiniteDistance = true;
+    skyboxMaterial.reflectionTexture = new BABYLON.CubeTexture("assets/sky/sky", scene);
+    skyboxMaterial.reflectionTexture.coordinatesMode = BABYLON.Texture.SKYBOX_MODE;
+    skyboxMaterial.diffuseColor = new BABYLON.Color3(0, 0, 0);
+    skyboxMaterial.specularColor = new BABYLON.Color3(0, 0, 0);
+    scene.registerBeforeRender(function() {skybox.position = camera.position});
+    skybox.material = skyboxMaterial;
+
+
 
     // ground
-    ground = BABYLON.Mesh.CreateGround("ground", 800, 2000, 2, scene);
+  /*  ground = BABYLON.Mesh.CreateGround("ground", 800, 2000, 2, scene);
+    var materialPlane = new BABYLON.StandardMaterial("texturePlane",scene);
+    materialPlane.diffuseTexture = new BABYLON.Texture("textures/textures/grass.jpg",scene);
+    //materialPlane.specularColor = new BABYLON.Color3(21, 250, 29);
+    materialPlane.diffuseTexture.uScale = 60;
+    materialPlane.diffuseTexture.vScale = 60;
+    materialPlane.backFaceCulling = false;
+    ground.material = materialPlane;
 
+    ground.physicsImpostor = new BABYLON.PhysicsImpostor(ground,BABYLON.PhysicsImpostor.BoxImpostor,{mass:0,restitution:0.9,move:true},scene);
+    ground.physicsImpostor.setLinearVelocity(new BABYLON.Vector3(0,0,10)); */
     // ship
     ship = new Ship(1, scene);
-    setInterval(box,350);
-    scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
-    scene.fogDensity = 0.01;
+    setInterval(box,500);
+  //  scene.fogMode = BABYLON.Scene.FOGMODE_EXP2;
+    //scene.fogDensity = 0.01;
 };
 var randomNumber = function (min, max) {
     if (min == max) {

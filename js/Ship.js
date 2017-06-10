@@ -16,6 +16,8 @@ Ship = function(size, scene) {
     this.position.z = 0;
     this.position.y = size/2;
 
+    //ship moving forward
+    this.speed = 13;
     // Movement attributes
     this.speed = 3;
     this.moveLeft = false;
@@ -55,7 +57,6 @@ Ship.prototype._initMovement = function() {
 
 Ship.prototype.move = function() {
     if (ship.moveRight) {
-      console.log("shipe moving to the right");
         ship.position.x += 1;
         camera.position.x += 1;
     }
@@ -81,3 +82,7 @@ Ship.prototype._initLabelUpdate = function() {
         handler : updateAmmoLabel
     }]);
 };
+Ship.prototype.setPhysicsEngine = function()
+{
+    ship.setPhysicsState({impostor: BABYLON.PhysicsEngine.BoxImpostor,move:true});
+}
